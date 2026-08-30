@@ -1,0 +1,123 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "word-count",
+  "title": "Word Count",
+  "description": "Count characters, words, sentences, and paragraphs in text.",
+  "icon": "word-count.png",
+  "access": "public",
+  "author": "almatkai",
+  "contributors": [
+    "koayon",
+    "chrismessina",
+    "litomore",
+    "aryan_thatte"
+  ],
+  "pastContributors": [
+    "danulqua"
+  ],
+  "categories": [
+    "Productivity"
+  ],
+  "license": "MIT",
+  "platforms": [
+    "macOS",
+    "Windows"
+  ],
+  "crossExtensions": [
+    "huzef44/screenocr"
+  ],
+  "commands": [
+    {
+      "name": "count",
+      "title": "Count",
+      "subtitle": "Word Count",
+      "description": "Count characters, words, sentences, and paragraphs in text.",
+      "mode": "view",
+      "keywords": [
+        "word",
+        "character",
+        "sentence",
+        "paragraph"
+      ],
+      "platforms": [
+        "macOS",
+        "Windows"
+      ]
+    },
+    {
+      "name": "count-screenshot",
+      "title": "Count from Screenshot",
+      "subtitle": "Word Count",
+      "description": "Capture a screenshot and count words, characters, sentences, and paragraphs using OCR.",
+      "mode": "no-view",
+      "keywords": [
+        "screenshot",
+        "ocr",
+        "word",
+        "character",
+        "sentence",
+        "paragraph",
+        "capture"
+      ],
+      "platforms": [
+        "macOS",
+        "Windows"
+      ]
+    },
+    {
+      "name": "count-overlay",
+      "title": "Word Count in Overlay",
+      "subtitle": "Word Count",
+      "description": "Show word count in an overlay on top of other applications.",
+      "mode": "no-view",
+      "keywords": [
+        "overlay",
+        "word",
+        "character",
+        "sentence",
+        "paragraph"
+      ],
+      "platforms": [
+        "macOS",
+        "Windows"
+      ]
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.104.1",
+    "@raycast/utils": "^2.2.2",
+    "raycast-cross-extension": "^0.2.3",
+    "react": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tsx": "^4.22.4",
+    "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "js-yaml": "^4.1.2"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test test/*.test.ts"
+  },
+  "id": "com.tezbar.word-count",
+  "version": "0.1.0",
+  "tezbar": {
+    "schemaVersion": 1,
+    "platforms": [
+      "macos",
+      "windows"
+    ],
+    "linuxStatus": "coming-soon",
+    "repository": "https://github.com/almatkai/word-count",
+    "upstream": {
+      "repository": "https://github.com/raycast/extensions",
+      "path": "extensions/word-count",
+      "commit": "6734d85992290066fd31a7f5bee3cca3d3545a1a"
+    }
+  }
+}
