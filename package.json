@@ -3,7 +3,7 @@
   "name": "word-count",
   "title": "Word Count",
   "description": "Count characters, words, sentences, and paragraphs in text.",
-  "icon": "word-count.png",
+  "icon": "assets/word-count.png",
   "access": "public",
   "author": "almatkai",
   "contributors": [
@@ -46,13 +46,12 @@
     },
     {
       "name": "count-screenshot",
-      "title": "Count from Screenshot",
+      "title": "Count Clipboard Text",
       "subtitle": "Word Count",
-      "description": "Capture a screenshot and count words, characters, sentences, and paragraphs using OCR.",
+      "description": "Count words, characters, sentences, and paragraphs in clipboard text.",
       "mode": "no-view",
       "keywords": [
-        "screenshot",
-        "ocr",
+        "clipboard",
         "word",
         "character",
         "sentence",
@@ -86,7 +85,6 @@
   "dependencies": {
     "@raycast/api": "^1.104.1",
     "@raycast/utils": "^2.2.2",
-    "raycast-cross-extension": "^0.2.3",
     "react": "^19.2.0"
   },
   "devDependencies": {
