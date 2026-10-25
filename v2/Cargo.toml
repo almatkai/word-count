@@ -1,0 +1,17 @@
+[package]
+name = "tezbar-word-count"
+version = "0.2.0"
+edition = "2021"
+rust-version = "1.85"
+license-file = "licenses/PACKAGE.txt"
+description = "Offline Word Count Native V2 engine and beta adapter source"
+repository = "https://github.com/almatkai/word-count"
+include = ["/Cargo.toml", "/Cargo.lock", "/src/**", "/examples/**", "/adapter/**", "/tests/**", "/scripts/**", "/fixtures/**", "/assets/**", "/licenses/**", "/.gitignore", "/INTEGRATION.md", "/LICENSES.json", "/NOTICES.md", "/PROVENANCE.json", "/README.md", "/RESULTS.json", "/RUST-LICENSES.json", "/SOURCE.json", "/VALIDATION.md", "/extension-v2.json"]
+
+[dependencies]
+serde = { version = "=1.0.228", features = ["derive"] }
+serde_json = "=1.0.150"
+
+[[example]]
+name = "oracle"
+path = "examples/oracle.rs"

@@ -1,0 +1,650 @@
+use serde_json::{json, Value};
+use std::collections::VecDeque;
+use std::sync::{Arc, Mutex};
+use word_count_beta_contracts::native_core::{
+    common::{CoreContext, CorePaths, CoreResult},
+    extensions::{v2_runtime, v2_sdk as sdk, v2_word_count as adapter, Sessions},
+};
+type Calls = Arc<Mutex<Vec<(String, Vec<Value>)>>>;
+struct Fixture {
+    _dir: tempfile::TempDir,
+    ctx: CoreContext,
+    queue: Arc<Mutex<VecDeque<(&'static str, CoreResult)>>>,
+    calls: Calls,
+}
+impl Fixture {
+    fn new(reads: Vec<(&'static str, CoreResult)>) -> Self {
+        let dir = tempfile::tempdir().unwrap();
+        let ctx = CoreContext::new(
+            CorePaths {
+                data_dir: dir.path().join("data"),
+                config_dir: dir.path().join("config"),
+                resource_dir: dir.path().join("resources"),
+                temp_dir: dir.path().join("temp"),
+                home_dir: dir.path().into(),
+            },
+            None,
+        );
+        let queue = Arc::new(Mutex::new(VecDeque::from(reads)));
+        let calls = Arc::new(Mutex::new(Vec::new()));
+        let (q, c) = (queue.clone(), calls.clone());
+        // ROUTER STUB: every request must be explicitly queued; any OS effect fails.
+        ctx.set_router(Arc::new(move |channel, args| {
+            c.lock().unwrap().push((channel.clone(), args));
+            let (expected, result) = q
+                .lock()
+                .unwrap()
+                .pop_front()
+                .expect("Unexpected OS request");
+            assert_eq!(channel, expected);
+            Box::pin(async move { result })
+        }))
+        .unwrap();
+        Self {
+            _dir: dir,
+            ctx,
+            queue,
+            calls,
+        }
+    }
+    fn install(&self) {
+        let mut manifest: Value =
+            serde_json::from_str(include_str!("../../../extension-v2.json")).unwrap();
+        manifest["fixturePreferences"] = json!({"unrelated":"kept"});
+        word_count_beta_contracts::native_core::common::write_json_atomic(
+            &self.ctx.paths.data_dir.join("fixture-installation.json"),
+            &manifest,
+        )
+        .unwrap();
+    }
+    fn done(&self) {
+        assert!(self.queue.lock().unwrap().is_empty());
+    }
+}
+fn selected(s: &str) -> (&'static str, CoreResult) {
+    ("core:platform:selected-text", Ok(json!(s)))
+}
+fn clipboard(s: &str) -> (&'static str, CoreResult) {
+    ("clipboard:read", Ok(json!(s)))
+}
+fn id(state: &Value, action: &str) -> String {
+    format!(
+        "word-count:{}:{}:{action}",
+        state["process"].as_str().unwrap(),
+        state["token"].as_str().unwrap()
+    )
+}
+async fn run(f: &Fixture, command: &str) -> (Value, Value) {
+    let mut state = json!({});
+    let view = adapter::handle(
+        &f.ctx,
+        command,
+        "extension:run-command",
+        &json!({"argumentValues":{},"preferences":{}}),
+        &mut state,
+    )
+    .await
+    .unwrap();
+    (state, view)
+}
+async fn action(f: &Fixture, s: &mut Value, action: &str, form: Option<Value>) -> CoreResult {
+    let mut body = json!({"actionId":id(s,action)});
+    if let Some(form) = form {
+        body["formValues"] = form;
+    }
+    adapter::handle(&f.ctx, "count", "extension:invoke-action", &body, s).await
+}
+fn field(view: &Value, name: &str) -> Value {
+    view["root"]["children"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|c| c["props"]["id"] == name)
+        .unwrap()["props"]
+        .clone()
+}
+#[tokio::test]
+async fn exact_selection_priority_trimming_and_order() {
+    let f = Fixture::new(vec![selected(" \u{feff}hello 世界 \n")]);
+    let (s, v) = run(&f, "count").await;
+    assert_eq!(s["text"], "hello 世界");
+    assert_eq!(s["counts"]["words"], 3);
+    assert_eq!(field(&v, "include-whitespace")["value"], true);
+    assert_eq!(v["actions"][0]["title"], "Toggle Whitespace");
+    assert_eq!(v["actions"][1]["title"], "Clear Text");
+    assert_eq!(f.calls.lock().unwrap()[0].1, Vec::<Value>::new());
+    f.done();
+}
+#[tokio::test]
+async fn whitespace_selection_and_caught_selection_errors_fall_back() {
+    for selection in [
+        selected(" \t\u{feff}"),
+        (
+            "core:platform:selected-text",
+            Err("PRIVATE selected text /Users/private".into()),
+        ),
+    ] {
+        let was_whitespace = selection.1.is_ok();
+        let f = Fixture::new(vec![selection, clipboard(" clip \n")]);
+        let (s, _) = run(&f, "count").await;
+        assert_eq!(s["text"], "clip");
+        assert_eq!(
+            s["notice"],
+            if was_whitespace {
+                "Text loaded from selected text · Text loaded from clipboard"
+            } else {
+                "Text loaded from clipboard"
+            }
+        );
+        f.done();
+    }
+}
+#[tokio::test]
+async fn clipboard_command_never_requests_selection_or_ocr() {
+    for text in ["", " \n\u{feff}", "one", "a b."] {
+        let f = Fixture::new(vec![clipboard(text)]);
+        let (s, v) = run(&f, "count-screenshot").await;
+        assert_eq!(v["mode"], "view");
+        assert_eq!(v["root"]["type"], "Form");
+        assert!(v["actions"].as_array().unwrap().is_empty());
+        let message = v["root"]["children"][0]["props"]["text"].as_str().unwrap();
+        if s["text"] == "" {
+            assert_eq!(message, "Nothing to count in the clipboard");
+        } else {
+            assert!(message.contains("word"));
+        }
+        f.done();
+    }
+}
+#[tokio::test]
+async fn overlay_is_honest_view_with_exact_toast_message() {
+    let f = Fixture::new(vec![selected("你好 world")]);
+    let (_, v) = run(&f, "count-overlay").await;
+    assert_eq!(v["mode"], "view");
+    assert_eq!(v["root"]["children"][0]["props"]["text"], "Word Count: 3");
+    f.done();
+}
+#[tokio::test]
+async fn malformed_and_transport_clipboard_failures_are_private_retryable_errors() {
+    for response in [
+        Err("PRIVATE clipboard /Users/private".into()),
+        Ok(Value::Null),
+        Ok(json!(true)),
+        Ok(json!({"text":"secret"})),
+        Ok(json!([])),
+    ] {
+        let f = Fixture::new(vec![("clipboard:read", response), clipboard("fixed")]);
+        let (mut s, v) = run(&f, "count-screenshot").await;
+        assert_eq!(s["error"], true);
+        assert!(!v.to_string().contains("PRIVATE"));
+        assert!(!v.to_string().contains("secret"));
+        let request = json!({"actionId":id(&s,"retry")});
+        let success = adapter::handle(
+            &f.ctx,
+            "count-screenshot",
+            "extension:invoke-action",
+            &request,
+            &mut s,
+        )
+        .await
+        .unwrap();
+        assert_eq!(success["mode"], "view");
+        assert_eq!(s["text"], "fixed");
+        assert_eq!(s["error"], false);
+        let before = s.clone();
+        assert!(adapter::handle(
+            &f.ctx,
+            "count-screenshot",
+            "extension:invoke-action",
+            &request,
+            &mut s
+        )
+        .await
+        .is_err());
+        assert_eq!(before, s);
+        f.done();
+    }
+}
+#[tokio::test]
+async fn malformed_selection_is_contract_error_and_never_silently_succeeds() {
+    for value in [Value::Null, json!(false), json!({"ok":true}), json!([])] {
+        let f = Fixture::new(vec![("core:platform:selected-text", Ok(value))]);
+        let (s, _) = run(&f, "count").await;
+        assert_eq!(s["error"], true);
+        f.done();
+    }
+}
+#[tokio::test]
+async fn stable_fields_omit_values_to_preserve_queued_drafts() {
+    let f = Fixture::new(vec![selected("initial")]);
+    let (mut s, initial) = run(&f, "count").await;
+    let text_id = field(&initial, "text")["actionId"].clone();
+    let updated = action(&f, &mut s, "text", Some(json!({"value":"new text"})))
+        .await
+        .unwrap();
+    assert_eq!(field(&updated, "text")["actionId"], text_id);
+    assert!(field(&updated, "text").get("value").is_none());
+    assert!(field(&updated, "include-whitespace").get("value").is_none());
+    let toggled = action(&f, &mut s, "toggle", None).await.unwrap();
+    assert_eq!(field(&toggled, "include-whitespace")["value"], false);
+    assert!(field(&toggled, "text").get("value").is_none());
+    let checkbox = action(&f, &mut s, "whitespace", Some(json!({"value":true})))
+        .await
+        .unwrap();
+    assert!(field(&checkbox, "text").get("value").is_none());
+    assert!(field(&checkbox, "include-whitespace")
+        .get("value")
+        .is_none());
+    let cleared = action(&f, &mut s, "clear", None).await.unwrap();
+    assert_eq!(field(&cleared, "text")["value"], "");
+    assert!(field(&cleared, "include-whitespace").get("value").is_none());
+    f.done();
+}
+#[tokio::test]
+async fn primary_action_accepts_complete_submit_map_and_preserves_latest_draft() {
+    let f = Fixture::new(vec![selected(""), clipboard("")]);
+    let (mut s, _) = run(&f, "count").await;
+    action(
+        &f,
+        &mut s,
+        "toggle",
+        Some(json!({"text":"newer queued draft","include-whitespace":false})),
+    )
+    .await
+    .unwrap();
+    assert_eq!(s["text"], "newer queued draft");
+    assert_eq!(s["include_whitespace"], true);
+    assert_eq!(s["counts"]["words"], 3);
+    f.done();
+}
+#[tokio::test]
+async fn malformed_events_do_not_consume_legitimate_bindings_or_mutate_output() {
+    let f = Fixture::new(vec![selected("computed")]);
+    let (mut s, _) = run(&f, "count").await;
+    for form in [
+        Value::Null,
+        json!([]),
+        json!({"text":"partial"}),
+        json!({"value":true}),
+        json!({"text":"x","include-whitespace":true,"arbitraryOutput":"attack"}),
+    ] {
+        let before = s.clone();
+        assert!(action(&f, &mut s, "toggle", Some(form)).await.is_err());
+        assert_eq!(s, before);
+    }
+    for form in [
+        json!({}),
+        json!({"value":null}),
+        json!({"value":"x","text":"forge"}),
+        json!({"value":false}),
+    ] {
+        let before = s.clone();
+        assert!(action(&f, &mut s, "text", Some(form)).await.is_err());
+        assert_eq!(s, before);
+    }
+    action(&f, &mut s, "text", Some(json!({"value":"legitimate"})))
+        .await
+        .unwrap();
+    assert_eq!(s["text"], "legitimate");
+    f.done();
+}
+#[tokio::test]
+async fn capability_scope_dispose_relaunch_process_and_discarded_search() {
+    let f = Fixture::new(vec![selected("one"), selected("two")]);
+    let (mut one, _) = run(&f, "count").await;
+    let (mut two, _) = run(&f, "count").await;
+    let bad = json!({"actionId":id(&one,"clear")});
+    let before = two.clone();
+    assert!(
+        adapter::handle(&f.ctx, "count", "extension:invoke-action", &bad, &mut two)
+            .await
+            .is_err()
+    );
+    assert_eq!(two, before);
+    for op in [
+        "extension:search-text-changed",
+        "extension:refresh-session",
+        "extension:load-more",
+    ] {
+        let mut staged = one.clone();
+        let v = adapter::handle(
+            &f.ctx,
+            "count",
+            op,
+            &json!({"searchText":"discarded"}),
+            &mut staged,
+        )
+        .await
+        .unwrap();
+        assert_eq!(v, sdk::unchanged());
+        assert_eq!(one, staged);
+    }
+    let mut old = one.clone();
+    old["process"] = json!("old-process");
+    assert!(
+        adapter::handle(&f.ctx, "count", "extension:invoke-action", &bad, &mut old)
+            .await
+            .is_err()
+    );
+    adapter::handle(
+        &f.ctx,
+        "count",
+        "extension:dispose-session",
+        &json!({}),
+        &mut one,
+    )
+    .await
+    .unwrap();
+    assert!(one.is_null());
+    assert!(
+        adapter::handle(&f.ctx, "count", "extension:invoke-action", &bad, &mut one)
+            .await
+            .is_err()
+    );
+    f.done();
+}
+#[tokio::test]
+async fn explicit_limit_rejection_preserves_committed_output() {
+    let f = Fixture::new(vec![selected("keep")]);
+    let (mut s, _) = run(&f, "count").await;
+    let before = s.clone();
+    let e = action(
+        &f,
+        &mut s,
+        "text",
+        Some(json!({"value":"x".repeat(tezbar_word_count::MAX_UTF16_UNITS+1)})),
+    )
+    .await
+    .unwrap_err();
+    assert!(e.contains("nothing was truncated"));
+    assert_eq!(s, before);
+    f.done();
+}
+#[tokio::test]
+async fn launch_arguments_preferences_and_commands_are_validated() {
+    let f = Fixture::new(vec![]);
+    let mut s = json!({});
+    for payload in [
+        Value::Null,
+        json!({"arguments":{},"argumentValues":null}),
+        json!({"argumentValues":{"text":"no"}}),
+        json!({"preferences":[]}),
+    ] {
+        assert!(
+            adapter::handle(&f.ctx, "count", "extension:run-command", &payload, &mut s)
+                .await
+                .is_err()
+        );
+        assert_eq!(s, json!({}));
+    }
+    assert!(adapter::handle(
+        &f.ctx,
+        "unknown",
+        "extension:run-command",
+        &json!({}),
+        &mut s
+    )
+    .await
+    .is_err());
+    f.done();
+}
+#[tokio::test]
+async fn real_native_sessions_launch_annotate_refresh_action_dispose_and_clear() {
+    let f = Fixture::new(vec![
+        selected("first"),
+        selected("second"),
+        selected("third"),
+    ]);
+    f.install();
+    let sessions = Sessions::default();
+    let launch = json!({"extensionId":"com.tezbar.native.word-count","commandName":"count","argumentValues":{}});
+    let v = sessions
+        .call(&f.ctx, "extension:run-command", launch.clone())
+        .await
+        .unwrap();
+    assert_eq!(v["ok"], true);
+    let session = v["sessionId"].clone();
+    assert!(session.as_str().unwrap().starts_with("native-extension:"));
+    assert_eq!(v["extensionId"], "com.tezbar.native.word-count");
+    let id = field(&v, "text")["actionId"].clone();
+    let changed = sessions
+        .call(
+            &f.ctx,
+            "extension:invoke-action",
+            json!({"sessionId":session,"actionId":id,"formValues":{"value":"edited"}}),
+        )
+        .await
+        .unwrap();
+    assert_eq!(changed["root"]["children"][0]["props"]["text"],"6 characters · 1 words \n1 sentences · 1 paragraphs \n1 minutes to read · 1 minutes to speak");
+    assert_eq!(
+        sessions
+            .call(
+                &f.ctx,
+                "extension:refresh-session",
+                json!({"sessionId":session})
+            )
+            .await
+            .unwrap(),
+        sdk::unchanged()
+    );
+    assert_eq!(
+        sessions
+            .call(
+                &f.ctx,
+                "extension:search-text-changed",
+                json!({"sessionId":session,"searchText":"discarded"})
+            )
+            .await
+            .unwrap(),
+        sdk::unchanged()
+    );
+    assert_eq!(
+        sessions
+            .call(
+                &f.ctx,
+                "extension:dispose-session",
+                json!({"sessionId":session})
+            )
+            .await
+            .unwrap(),
+        true
+    );
+    assert_eq!(
+        sessions
+            .call(
+                &f.ctx,
+                "extension:invoke-action",
+                json!({"sessionId":session,"actionId":id,"formValues":{"value":"stale"}})
+            )
+            .await
+            .unwrap()["ok"],
+        false
+    );
+    let _ = sessions
+        .call(&f.ctx, "extension:run-command", launch.clone())
+        .await
+        .unwrap();
+    sessions.clear().await;
+    let _ = sessions
+        .call(&f.ctx, "extension:run-command", launch)
+        .await
+        .unwrap();
+    sessions.uninstall().await;
+    f.done();
+}
+#[tokio::test]
+async fn real_native_sessions_require_installation_and_never_fall_back_on_stale_ids() {
+    let f = Fixture::new(vec![]);
+    let sessions = Sessions::default();
+    let v = sessions
+        .call(
+            &f.ctx,
+            "extension:run-command",
+            json!({"extensionId":"com.tezbar.native.word-count","commandName":"count"}),
+        )
+        .await
+        .unwrap();
+    assert_eq!(v["ok"], false);
+    let v=sessions.call(&f.ctx,"extension:run-command",json!({"sessionId":"native-extension:stale","extensionId":"com.tezbar.native.word-count","commandName":"count"})).await.unwrap();
+    assert_eq!(v["ok"], false);
+    f.done();
+}
+#[test]
+fn manifest_commands_coverage_aliases_and_pinned_host_need_registration() {
+    let manifest: Value = serde_json::from_str(include_str!("../../../extension-v2.json")).unwrap();
+    let names: Vec<_> = manifest["commands"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|v| v["name"].as_str().unwrap())
+        .collect();
+    assert_eq!(names, adapter::commands());
+    for id in [
+        "word-count",
+        "raycast.word-count",
+        "com.tezbar.native.word-count",
+    ] {
+        for name in &names {
+            assert!(v2_runtime::supports(id, name));
+        }
+    }
+    assert_eq!(v2_runtime::canonical_id("word-count"), manifest["id"]);
+    assert!(!v2_runtime::supports(
+        "com.tezbar.native.word-count",
+        "other"
+    ));
+    let pinned =
+        include_str!("../../../fixtures/beta/src-tauri/src/native_core/extensions/v2_runtime.rs");
+    assert!(!pinned.contains("\"word-count\""));
+}
+#[tokio::test]
+async fn pinned_sdk_atomic_store_keeps_unknown_keys_and_rejects_corruption() {
+    let f = Fixture::new(vec![]);
+    assert_eq!(sdk::read_store(&f.ctx, "fixture").await.unwrap(), json!({}));
+    sdk::update_store(&f.ctx, "fixture", |v| {
+        *v = json!({"unknown":{"keep":true},"counter":0});
+        Ok(())
+    })
+    .await
+    .unwrap();
+    let mut tasks = vec![];
+    for _ in 0..20 {
+        let c = f.ctx.clone();
+        tasks.push(tokio::spawn(async move {
+            sdk::update_store(&c, "fixture", |v| {
+                v["counter"] = json!(v["counter"].as_u64().unwrap() + 1);
+                Ok(())
+            })
+            .await
+            .unwrap()
+        }));
+    }
+    for task in tasks {
+        task.await.unwrap();
+    }
+    let saved = sdk::read_store(&f.ctx, "fixture").await.unwrap();
+    assert_eq!(saved, json!({"unknown":{"keep":true},"counter":20}));
+    assert!(sdk::update_store(&f.ctx, "fixture", |v| {
+        v["counter"] = json!(0);
+        Err("reject".into())
+    })
+    .await
+    .is_err());
+    assert_eq!(sdk::read_store(&f.ctx, "fixture").await.unwrap(), saved);
+    let path = f
+        .ctx
+        .paths
+        .data_dir
+        .join("native-extensions-v2/fixture/storage.json");
+    std::fs::write(&path, b"corrupt").unwrap();
+    assert!(sdk::read_store(&f.ctx, "fixture").await.is_err());
+    assert!(sdk::update_store(&f.ctx, "fixture", |_| Ok(()))
+        .await
+        .is_err());
+    assert_eq!(std::fs::read(path).unwrap(), b"corrupt");
+    f.done();
+}
+#[tokio::test]
+async fn adapter_never_creates_persistence_for_source_use_state_only() {
+    let f = Fixture::new(vec![selected("transient")]);
+    let (mut s, _) = run(&f, "count").await;
+    action(&f, &mut s, "text", Some(json!({"value":"draft"})))
+        .await
+        .unwrap();
+    assert!(!f.ctx.paths.data_dir.exists());
+    assert!(!f.ctx.paths.config_dir.exists());
+    f.done();
+}
+#[tokio::test]
+async fn native_clear_cancels_pending_selection_without_os_or_lingering_session() {
+    let f = Fixture::new(vec![]);
+    f.install();
+    let sessions = Sessions::default();
+    let ctx = CoreContext::new(f.ctx.paths.clone(), None);
+    let entered = Arc::new(tokio::sync::Notify::new());
+    let notify = entered.clone();
+    ctx.set_router(Arc::new(move |channel, args| {
+        assert_eq!(channel, "core:platform:selected-text");
+        assert!(args.is_empty());
+        let notify = notify.clone();
+        Box::pin(async move {
+            notify.notify_one();
+            std::future::pending::<CoreResult>().await
+        })
+    }))
+    .unwrap();
+    let s = sessions.clone();
+    let c = ctx.clone();
+    let pending = tokio::spawn(async move {
+        s.call(
+            &c,
+            "extension:run-command",
+            json!({"extensionId":"com.tezbar.native.word-count","commandName":"count"}),
+        )
+        .await
+        .unwrap()
+    });
+    tokio::time::timeout(std::time::Duration::from_secs(2), entered.notified())
+        .await
+        .unwrap();
+    sessions.clear().await;
+    let result = tokio::time::timeout(std::time::Duration::from_secs(2), pending)
+        .await
+        .unwrap()
+        .unwrap();
+    assert_eq!(result["ok"], false);
+    assert!(result.get("sessionId").is_none());
+    f.done();
+}
+#[tokio::test]
+async fn native_uninstall_invalidates_active_capabilities_and_alias_launch_is_compiled() {
+    let f = Fixture::new(vec![selected("alias")]);
+    f.install();
+    let sessions = Sessions::default();
+    let v = sessions
+        .call(
+            &f.ctx,
+            "extension:run-command",
+            json!({"extensionId":"raycast.word-count","commandName":"count"}),
+        )
+        .await
+        .unwrap();
+    assert_eq!(v["ok"], true);
+    let id = v["sessionId"].clone();
+    std::fs::remove_file(f.ctx.paths.data_dir.join("fixture-installation.json")).unwrap();
+    let result = sessions
+        .call(
+            &f.ctx,
+            "extension:invoke-action",
+            json!({"sessionId":id,"actionId":v["actions"][1]["id"]}),
+        )
+        .await
+        .unwrap();
+    assert_eq!(result["ok"], false);
+    let stale = sessions
+        .call(&f.ctx, "extension:refresh-session", json!({"sessionId":id}))
+        .await
+        .unwrap();
+    assert_eq!(stale["ok"], false);
+    f.done();
+}

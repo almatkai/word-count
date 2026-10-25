@@ -1,0 +1,6 @@
+target/
+.work/
+!fixtures/**/dist/
+!fixtures/**/dist/**
+!fixtures/**/node_modules/
+!fixtures/**/node_modules/**

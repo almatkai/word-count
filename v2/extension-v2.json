@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 2,
+  "id": "com.tezbar.native.word-count",
+  "slug": "word-count",
+  "name": "Word Count",
+  "version": "0.2.0",
+  "description": "Count characters, words, sentences, and paragraphs in text. Original author: itsmingjie; contributors: koayon, chrismessina, litomore, aryan_thatte. Own adaptation: almatkai.",
+  "runtime": "rust",
+  "replaces": [
+    "raycast.word-count"
+  ],
+  "icon": "/extensions/icons/word-count.png",
+  "platforms": [
+    "macOS",
+    "Windows"
+  ],
+  "preferences": [],
+  "commands": [
+    {
+      "name": "count",
+      "title": "Count",
+      "subtitle": "Word Count",
+      "description": "Count characters, words, sentences, and paragraphs in text.",
+      "mode": "view",
+      "keywords": [
+        "word",
+        "character",
+        "sentence",
+        "paragraph"
+      ],
+      "platforms": [
+        "macOS",
+        "Windows"
+      ],
+      "runtime": "rust",
+      "preferences": [],
+      "arguments": []
+    },
+    {
+      "name": "count-screenshot",
+      "title": "Count Clipboard Text",
+      "subtitle": "Word Count",
+      "description": "Count words, characters, sentences, and paragraphs in clipboard text.",
+      "mode": "view",
+      "keywords": [
+        "clipboard",
+        "word",
+        "character",
+        "sentence",
+        "paragraph",
+        "capture"
+      ],
+      "platforms": [
+        "macOS",
+        "Windows"
+      ],
+      "runtime": "rust",
+      "preferences": [],
+      "arguments": [],
+      "gap": "Original HUD/toast is presented as a visible result form; beta has no native HUD/toast/overlay API."
+    },
+    {
+      "name": "count-overlay",
+      "title": "Word Count in Overlay",
+      "subtitle": "Word Count",
+      "description": "Show word count in an overlay on top of other applications.",
+      "mode": "view",
+      "keywords": [
+        "overlay",
+        "word",
+        "character",
+        "sentence",
+        "paragraph"
+      ],
+      "platforms": [
+        "macOS",
+        "Windows"
+      ],
+      "runtime": "rust",
+      "preferences": [],
+      "arguments": [],
+      "gap": "Original HUD/toast is presented as a visible result form; beta has no native HUD/toast/overlay API."
+    }
+  ],
+  "verification": [
+    {
+      "platform": "macOS",
+      "state": "not-run",
+      "note": "Host registration/rebuild and real desktop QA have not run; see VALIDATION.md."
+    },
+    {
+      "platform": "Windows",
+      "state": "not-run",
+      "note": "Host registration/rebuild and real desktop QA have not run; see VALIDATION.md."
+    }
+  ]
+}

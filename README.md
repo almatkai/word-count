@@ -17,3 +17,7 @@ Capture any text on screen and get instant character, word, sentence, and paragr
 
 - Press `Esc` to cancel screenshot capture
 - Works best with clear, high-contrast text
+
+## Native V2
+
+[See the Rust Native V2 implementation, integration instructions, and validation results.](v2/README.md)

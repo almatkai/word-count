@@ -1,0 +1,79 @@
+{
+  "aggregateSpdx": "MIT AND Apache-2.0 AND BSD-3-Clause AND Unicode-DFS-2016 AND Unicode-3.0 AND W3C-20150513 AND CC-BY-4.0 AND LicenseRef-W3C-Community-Final-Specification",
+  "scope": "Supplied source/fixtures and retained supplemental notices; individual grants remain authoritative. Cargo uses licenses/PACKAGE.txt.",
+  "actualTextEvidence": [
+    {
+      "path": "fixtures/libraries/react/LICENSE",
+      "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+    },
+    {
+      "path": "fixtures/libraries/typescript/LICENSE.txt",
+      "sha256": "a7d00bfd54525bc694b6e32f64c7ebcf5e6b7ae3657be5cc12767bce74654a47"
+    },
+    {
+      "path": "fixtures/libraries/typescript/ThirdPartyNoticeText.txt",
+      "sha256": "1af3c68039c57e539422da82a4faada506ce6d0ea6f90e0b699d02dbcdb7a90c"
+    },
+    {
+      "path": "fixtures/schema/node_modules/ajv/LICENSE",
+      "sha256": "a05350a88e318e4f5f2c2a1ff1e2e88daa4dd38e6e78b71cccae422bdc762cc3"
+    },
+    {
+      "path": "fixtures/schema/node_modules/fast-deep-equal/LICENSE",
+      "sha256": "7bf9b2de73a6b356761c948d0e9eeb4be6c1270bd04c79cd489c1e400ffdfc1a"
+    },
+    {
+      "path": "fixtures/schema/node_modules/fast-uri/LICENSE",
+      "sha256": "b010b0dfdfdb23d7396e03b82cd4621fc9bb8f95d6b0aea70b9c24e12074c786"
+    },
+    {
+      "path": "fixtures/schema/node_modules/json-schema-traverse/LICENSE",
+      "sha256": "7bf9b2de73a6b356761c948d0e9eeb4be6c1270bd04c79cd489c1e400ffdfc1a"
+    },
+    {
+      "path": "fixtures/schema/node_modules/require-from-string/LICENSE",
+      "sha256": "6ee0feb1f6ef996ff5a68600f8cf98909cf412d39ef3cdceaefd87d636fa1b7f"
+    },
+    {
+      "path": "fixtures/schema/node_modules/json-schema-traverse/license",
+      "sha256": "7bf9b2de73a6b356761c948d0e9eeb4be6c1270bd04c79cd489c1e400ffdfc1a"
+    },
+    {
+      "path": "fixtures/schema/node_modules/fast-uri/license",
+      "sha256": "b010b0dfdfdb23d7396e03b82cd4621fc9bb8f95d6b0aea70b9c24e12074c786"
+    },
+    {
+      "path": "fixtures/schema/node_modules/ajv/license",
+      "sha256": "a05350a88e318e4f5f2c2a1ff1e2e88daa4dd38e6e78b71cccae422bdc762cc3"
+    },
+    {
+      "path": "fixtures/schema/node_modules/fast-deep-equal/license",
+      "sha256": "7bf9b2de73a6b356761c948d0e9eeb4be6c1270bd04c79cd489c1e400ffdfc1a"
+    },
+    {
+      "path": "fixtures/schema/node_modules/require-from-string/license",
+      "sha256": "6ee0feb1f6ef996ff5a68600f8cf98909cf412d39ef3cdceaefd87d636fa1b7f"
+    }
+  ],
+  "unresolved": [
+    {
+      "package": "@raycast/api",
+      "version": "1.104.1",
+      "evidence": "Actual package metadata MIT; no published full license text; V1 validation only, code not redistributed."
+    },
+    {
+      "package": "@raycast/utils",
+      "version": "2.2.2",
+      "evidence": "Actual package metadata MIT; no published full license text; V1 validation only, code not redistributed."
+    },
+    {
+      "package": "r-efi",
+      "version": "6.0.0",
+      "evidence": "Excluded UEFI target dependency, declared license metadata but no full text in actual crate; code not redistributed."
+    },
+    {
+      "package": "Countable attribution",
+      "evidence": "Own source header MIT attribution retained; no independently pinned upstream revision in the own source."
+    }
+  ]
+}
