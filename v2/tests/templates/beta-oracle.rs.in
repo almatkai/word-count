@@ -1,0 +1,83 @@
+//! Validation driver. All read routes are stubbed. Never ships in the host.
+use serde_json::{json, Value};
+use std::io::{self, BufRead};
+use std::sync::{Arc, Mutex};
+use word_count_beta_contracts::native_core::{
+    common::{CoreContext, CorePaths},
+    extensions::v2_word_count,
+};
+#[tokio::main]
+async fn main() {
+    for line in io::stdin().lock().lines() {
+        let input: Value = serde_json::from_str(&line.unwrap()).unwrap();
+        let ctx = CoreContext::new(
+            CorePaths {
+                data_dir: "never-created/data".into(),
+                config_dir: "never-created/config".into(),
+                resource_dir: "never-created/resources".into(),
+                temp_dir: "never-created/temp".into(),
+                home_dir: "never-created".into(),
+            },
+            None,
+        );
+        let calls = Arc::new(Mutex::new(vec![]));
+        let seen = calls.clone();
+        let values = input.clone();
+        ctx.set_router(Arc::new(move |channel, args| {
+            assert!(args.is_empty());
+            seen.lock().unwrap().push(channel.clone());
+            let response = match channel.as_str() {
+                "core:platform:selected-text" => values["selected"].clone(),
+                "clipboard:read" => values["clipboard"].clone(),
+                _ => panic!("Forbidden effect"),
+            };
+            Box::pin(async move {
+                if response.get("error").is_some() {
+                    Err("PRIVATE mocked failure".into())
+                } else {
+                    Ok(response["value"].clone())
+                }
+            })
+        }))
+        .unwrap();
+        let command = input["command"].as_str().unwrap();
+        let mut state = json!({});
+        let view = v2_word_count::handle(
+            &ctx,
+            command,
+            "extension:run-command",
+            &json!({"argumentValues":{},"preferences":{}}),
+            &mut state,
+        )
+        .await
+        .unwrap();
+        let mut views = vec![view.clone()];
+        for step in input["steps"].as_array().into_iter().flatten() {
+            let action = step["action"].as_str().unwrap();
+            let id = format!(
+                "word-count:{}:{}:{action}",
+                state["process"].as_str().unwrap(),
+                state["token"].as_str().unwrap()
+            );
+            let mut payload = json!({"actionId":id});
+            if let Some(form) = step.get("formValues") {
+                payload["formValues"] = form.clone();
+            }
+            views.push(
+                v2_word_count::handle(
+                    &ctx,
+                    command,
+                    "extension:invoke-action",
+                    &payload,
+                    &mut state,
+                )
+                .await
+                .unwrap(),
+            );
+        }
+        println!(
+            "{}",
+            json!({"state":state,"view":view,"views":views,"calls":*calls.lock().unwrap()})
+        );
+    }
+}

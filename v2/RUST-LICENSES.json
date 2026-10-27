@@ -1,0 +1,451 @@
+[
+  {
+    "name": "bitflags",
+    "version": "2.13.2",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.56.0",
+    "evidence": [
+      "licenses/rust/bitflags-2.13.2/LICENSE-APACHE",
+      "licenses/rust/bitflags-2.13.2/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "bumpalo",
+    "version": "3.20.3",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.71.1",
+    "evidence": [
+      "licenses/rust/bumpalo-3.20.3/LICENSE-APACHE",
+      "licenses/rust/bumpalo-3.20.3/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "cfg-if",
+    "version": "1.0.5",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.32",
+    "evidence": [
+      "licenses/rust/cfg-if-1.0.5/LICENSE-APACHE",
+      "licenses/rust/cfg-if-1.0.5/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "errno",
+    "version": "0.3.14",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.56",
+    "evidence": [
+      "licenses/rust/errno-0.3.14/LICENSE-APACHE",
+      "licenses/rust/errno-0.3.14/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "fastrand",
+    "version": "2.5.0",
+    "declaredSpdx": "Apache-2.0 OR MIT",
+    "rustVersion": "1.63",
+    "evidence": [
+      "licenses/rust/fastrand-2.5.0/LICENSE-APACHE",
+      "licenses/rust/fastrand-2.5.0/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "futures-core",
+    "version": "0.3.34",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.36",
+    "evidence": [
+      "licenses/rust/futures-core-0.3.34/LICENSE-APACHE",
+      "licenses/rust/futures-core-0.3.34/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "futures-task",
+    "version": "0.3.34",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.71",
+    "evidence": [
+      "licenses/rust/futures-task-0.3.34/LICENSE-APACHE",
+      "licenses/rust/futures-task-0.3.34/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "futures-util",
+    "version": "0.3.34",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.71",
+    "evidence": [
+      "licenses/rust/futures-util-0.3.34/LICENSE-APACHE",
+      "licenses/rust/futures-util-0.3.34/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "getrandom",
+    "version": "0.4.3",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.85",
+    "evidence": [
+      "licenses/rust/getrandom-0.4.3/LICENSE-APACHE",
+      "licenses/rust/getrandom-0.4.3/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "itoa",
+    "version": "1.0.18",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.68",
+    "evidence": [
+      "licenses/rust/itoa-1.0.18/LICENSE-APACHE",
+      "licenses/rust/itoa-1.0.18/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "js-sys",
+    "version": "0.3.106",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.81",
+    "evidence": [
+      "licenses/rust/js-sys-0.3.106/LICENSE-APACHE",
+      "licenses/rust/js-sys-0.3.106/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "libc",
+    "version": "0.2.191",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.65",
+    "evidence": [
+      "licenses/rust/libc-0.2.191/LICENSE-APACHE",
+      "licenses/rust/libc-0.2.191/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "linux-raw-sys",
+    "version": "0.12.1",
+    "declaredSpdx": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+    "rustVersion": "1.63",
+    "evidence": [
+      "licenses/rust/linux-raw-sys-0.12.1/LICENSE-APACHE",
+      "licenses/rust/linux-raw-sys-0.12.1/LICENSE-Apache-2.0_WITH_LLVM-exception",
+      "licenses/rust/linux-raw-sys-0.12.1/COPYRIGHT",
+      "licenses/rust/linux-raw-sys-0.12.1/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "log",
+    "version": "0.4.32",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.71.0",
+    "evidence": [
+      "licenses/rust/log-0.4.32/LICENSE-APACHE",
+      "licenses/rust/log-0.4.32/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "memchr",
+    "version": "2.8.3",
+    "declaredSpdx": "Unlicense OR MIT",
+    "rustVersion": "1.61",
+    "evidence": [
+      "licenses/rust/memchr-2.8.3/COPYING",
+      "licenses/rust/memchr-2.8.3/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "once_cell",
+    "version": "1.21.4",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.65",
+    "evidence": [
+      "licenses/rust/once_cell-1.21.4/LICENSE-APACHE",
+      "licenses/rust/once_cell-1.21.4/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "pin-project-lite",
+    "version": "0.2.17",
+    "declaredSpdx": "Apache-2.0 OR MIT",
+    "rustVersion": "1.37",
+    "evidence": [
+      "licenses/rust/pin-project-lite-0.2.17/LICENSE-APACHE",
+      "licenses/rust/pin-project-lite-0.2.17/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "proc-macro2",
+    "version": "1.0.107",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.71",
+    "evidence": [
+      "licenses/rust/proc-macro2-1.0.107/LICENSE-APACHE",
+      "licenses/rust/proc-macro2-1.0.107/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "quote",
+    "version": "1.0.47",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.71",
+    "evidence": [
+      "licenses/rust/quote-1.0.47/LICENSE-APACHE",
+      "licenses/rust/quote-1.0.47/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "r-efi",
+    "version": "6.0.0",
+    "declaredSpdx": "MIT OR Apache-2.0 OR LGPL-2.1-or-later",
+    "rustVersion": "1.68",
+    "evidence": [],
+    "unresolved": true
+  },
+  {
+    "name": "rustix",
+    "version": "1.1.5",
+    "declaredSpdx": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+    "rustVersion": "1.65",
+    "evidence": [
+      "licenses/rust/rustix-1.1.5/LICENSE-APACHE",
+      "licenses/rust/rustix-1.1.5/LICENSE-Apache-2.0_WITH_LLVM-exception",
+      "licenses/rust/rustix-1.1.5/COPYRIGHT",
+      "licenses/rust/rustix-1.1.5/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "rustversion",
+    "version": "1.0.23",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.31",
+    "evidence": [
+      "licenses/rust/rustversion-1.0.23/LICENSE-APACHE",
+      "licenses/rust/rustversion-1.0.23/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "serde",
+    "version": "1.0.228",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.56",
+    "evidence": [
+      "licenses/rust/serde-1.0.228/LICENSE-APACHE",
+      "licenses/rust/serde-1.0.228/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "serde_core",
+    "version": "1.0.228",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.56",
+    "evidence": [
+      "licenses/rust/serde_core-1.0.228/LICENSE-APACHE",
+      "licenses/rust/serde_core-1.0.228/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "serde_derive",
+    "version": "1.0.228",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.61",
+    "evidence": [
+      "licenses/rust/serde_derive-1.0.228/LICENSE-APACHE",
+      "licenses/rust/serde_derive-1.0.228/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "serde_json",
+    "version": "1.0.150",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.71",
+    "evidence": [
+      "licenses/rust/serde_json-1.0.150/LICENSE-APACHE",
+      "licenses/rust/serde_json-1.0.150/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "slab",
+    "version": "0.4.12",
+    "declaredSpdx": "MIT",
+    "rustVersion": "1.51",
+    "evidence": [
+      "licenses/rust/slab-0.4.12/LICENSE"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "syn",
+    "version": "2.0.119",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.71",
+    "evidence": [
+      "licenses/rust/syn-2.0.119/LICENSE-APACHE",
+      "licenses/rust/syn-2.0.119/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "syn",
+    "version": "3.0.9",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.71",
+    "evidence": [
+      "licenses/rust/syn-3.0.9/LICENSE-APACHE",
+      "licenses/rust/syn-3.0.9/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "tempfile",
+    "version": "3.27.0",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.63",
+    "evidence": [
+      "licenses/rust/tempfile-3.27.0/LICENSE-APACHE",
+      "licenses/rust/tempfile-3.27.0/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "tokio",
+    "version": "1.52.3",
+    "declaredSpdx": "MIT",
+    "rustVersion": "1.71",
+    "evidence": [
+      "licenses/rust/tokio-1.52.3/LICENSE"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "tokio-macros",
+    "version": "2.7.2",
+    "declaredSpdx": "MIT",
+    "rustVersion": "1.71",
+    "evidence": [
+      "licenses/rust/tokio-macros-2.7.2/LICENSE"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "unicode-ident",
+    "version": "1.0.27",
+    "declaredSpdx": "(MIT OR Apache-2.0) AND Unicode-3.0",
+    "rustVersion": "1.71",
+    "evidence": [
+      "licenses/rust/unicode-ident-1.0.27/LICENSE-UNICODE",
+      "licenses/rust/unicode-ident-1.0.27/LICENSE-APACHE",
+      "licenses/rust/unicode-ident-1.0.27/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "uuid",
+    "version": "1.23.3",
+    "declaredSpdx": "Apache-2.0 OR MIT",
+    "rustVersion": "1.85.0",
+    "evidence": [
+      "licenses/rust/uuid-1.23.3/LICENSE-APACHE",
+      "licenses/rust/uuid-1.23.3/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "wasm-bindgen",
+    "version": "0.2.129",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.81",
+    "evidence": [
+      "licenses/rust/wasm-bindgen-0.2.129/LICENSE-APACHE",
+      "licenses/rust/wasm-bindgen-0.2.129/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "wasm-bindgen-macro",
+    "version": "0.2.129",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.81",
+    "evidence": [
+      "licenses/rust/wasm-bindgen-macro-0.2.129/LICENSE-APACHE",
+      "licenses/rust/wasm-bindgen-macro-0.2.129/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "wasm-bindgen-macro-support",
+    "version": "0.2.129",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.81",
+    "evidence": [
+      "licenses/rust/wasm-bindgen-macro-support-0.2.129/LICENSE-APACHE",
+      "licenses/rust/wasm-bindgen-macro-support-0.2.129/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "wasm-bindgen-shared",
+    "version": "0.2.129",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.81",
+    "evidence": [
+      "licenses/rust/wasm-bindgen-shared-0.2.129/LICENSE-APACHE",
+      "licenses/rust/wasm-bindgen-shared-0.2.129/LICENSE-MIT"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "windows-link",
+    "version": "0.2.1",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.71",
+    "evidence": [
+      "licenses/rust/windows-link-0.2.1/license-apache-2.0",
+      "licenses/rust/windows-link-0.2.1/license-mit"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "windows-sys",
+    "version": "0.61.2",
+    "declaredSpdx": "MIT OR Apache-2.0",
+    "rustVersion": "1.71",
+    "evidence": [
+      "licenses/rust/windows-sys-0.61.2/license-apache-2.0",
+      "licenses/rust/windows-sys-0.61.2/license-mit"
+    ],
+    "unresolved": false
+  },
+  {
+    "name": "zmij",
+    "version": "1.0.23",
+    "declaredSpdx": "MIT",
+    "rustVersion": "1.71",
+    "evidence": [
+      "licenses/rust/zmij-1.0.23/LICENSE-MIT"
+    ],
+    "unresolved": false
+  }
+]

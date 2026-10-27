@@ -1,0 +1,13 @@
+{
+  "source": "472bc57b5b3d4eafbdfc7e5abffb52e11bdac04e",
+  "beta": "fd300e276356587726566026f072563eb9c34cb1",
+  "original": "6734d85992290066fd31a7f5bee3cca3d3545a1a",
+  "xerj": {
+    "prefix": "ax-5c8424712226",
+    "result": "exit 3 completed-with-junk; 12/12 code files indexed; hidden/asset exclusions; use exact rg for exhaustive checks",
+    "finalRefresh": {
+      "exit": 1,
+      "reason": "Frozen dataset/schema evolution rejected v2/Cargo.toml; index incomplete after additions. No global restart or schema mutation; exact rg/Git/hash audits used."
+    }
+  }
+}

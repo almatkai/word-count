@@ -1,0 +1,21 @@
+Word Count Native V2 source and bundled validation fixtures
+
+SPDX aggregate for supplied source/fixtures and retained supplemental notices:
+MIT AND Apache-2.0 AND BSD-3-Clause AND Unicode-DFS-2016 AND Unicode-3.0 AND W3C-20150513 AND CC-BY-4.0 AND LicenseRef-W3C-Community-Final-Specification
+
+New Rust engine/adapter source: MIT, under word-count-MIT.txt.
+Pinned Tezbar source/fixtures: Apache-2.0, under tezbar-Apache-2.0.txt;
+its captured Color Picker example separately retains its upstream MIT notice.
+Schema validator fast-uri: BSD-3-Clause, under fixtures/schema/node_modules/fast-uri/LICENSE.
+Other bundled schema validation libraries and React: their actual MIT license files.
+TypeScript: actual Apache-2.0 LICENSE.txt and full ThirdPartyNoticeText.txt.
+The supplemental Unicode, DOM, WHATWG, Web Background Synchronization and WebGL
+notices from that TypeScript distribution are retained without editing or omission.
+LicenseRef-W3C-Community-Final-Specification identifies the exact supplemental
+agreement extracted into the adjacent .txt file, not a guessed permissive license.
+Unicode-ident build dependency: actual Unicode-3.0 license plus MIT or Apache choice.
+
+This expression does not replace the individual grants, copyrights or notices.
+Read NOTICES.md, LICENSES.json, RUST-LICENSES.json and the actual texts in licenses/
+and fixtures/. Some metadata-only legacy dependencies and excluded target packages
+have unresolved full-text evidence, explicitly recorded in those files.

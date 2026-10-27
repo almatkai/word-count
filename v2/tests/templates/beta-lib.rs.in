@@ -1,0 +1,113 @@
+//! Contract fixture, not a desktop host. Only labeled seams below are stubs.
+extern crate self as tauri;
+// TAURI STUB: AppHandle only satisfies the unchanged common.rs type dependency.
+// No window, clipboard, focus, browser, or input APIs are implemented or called.
+#[derive(Clone)]
+pub struct AppHandle;
+pub trait Emitter {
+    fn emit(&self, channel: &str, payload: serde_json::Value) -> Result<(), String>;
+}
+impl Emitter for AppHandle {
+    fn emit(&self, _: &str, _: serde_json::Value) -> Result<(), String> {
+        panic!("OS effects forbidden")
+    }
+}
+// Integration tests link the normal library, compiling the pinned modules unchanged.
+// Unit-test mode is empty to avoid beta's unrelated ExtensionsCore test suite.
+#[cfg(not(test))]
+pub mod native_core {
+    pub mod common;
+    pub mod extensions {
+        // Unchanged pinned SDK and NativeSessions. Not reimplementations.
+        #[allow(dead_code)]
+        mod native;
+        #[allow(dead_code)]
+        pub mod v2_sdk;
+        pub mod v2_word_count;
+        // REGISTRATION STUB: what must be added to beta v2_runtime.rs after review.
+        pub mod v2_runtime {
+            use super::v2_word_count;
+            use crate::native_core::common::{CoreContext, CoreResult};
+            use serde_json::Value;
+            pub fn slug(id: &str) -> Option<&str> {
+                match id {
+                    "word-count" | "raycast.word-count" | "com.tezbar.native.word-count" => {
+                        Some("word-count")
+                    }
+                    _ => None,
+                }
+            }
+            pub fn canonical_id(slug: &str) -> String {
+                format!("com.tezbar.native.{slug}")
+            }
+            pub fn commands(slug: &str) -> &'static [&'static str] {
+                if slug == "word-count" {
+                    v2_word_count::commands()
+                } else {
+                    &[]
+                }
+            }
+            pub fn supports(id: &str, command: &str) -> bool {
+                slug(id).is_some_and(|s| commands(s).contains(&command))
+            }
+            pub async fn handle(
+                ctx: &CoreContext,
+                slug: &str,
+                command: &str,
+                op: &str,
+                payload: &Value,
+                state: &mut Value,
+            ) -> CoreResult {
+                if slug != "word-count" {
+                    return Err("No fixture adapter".into());
+                }
+                v2_word_count::handle(ctx, command, op, payload, state).await
+            }
+        }
+        // INSTALLATION STUB: only fixture packages in a temporary data directory.
+        // The real registry.rs is captured for review, not silently treated as installed.
+        mod registry {
+            use crate::native_core::common::{CoreContext, CoreResult};
+            use serde_json::Value;
+            pub fn installed_command(ctx: &CoreContext, id: &str, command: &str) -> Option<Value> {
+                super::v2_runtime::slug(id)?;
+                let bytes =
+                    std::fs::read(ctx.paths.data_dir.join("fixture-installation.json")).ok()?;
+                let manifest: Value = serde_json::from_slice(&bytes).ok()?;
+                manifest["commands"]
+                    .as_array()?
+                    .iter()
+                    .any(|c| c["name"] == command)
+                    .then_some(manifest)
+            }
+            pub fn preferences(extension: &Value, _: Option<&str>) -> CoreResult {
+                Ok(extension["fixturePreferences"]
+                    .as_object()
+                    .cloned()
+                    .map_or_else(|| serde_json::json!({}), Value::Object))
+            }
+        }
+        // Public wrapper solely exposes otherwise pub(super) NativeSessions to tests.
+        #[derive(Clone, Default)]
+        pub struct Sessions(native::NativeSessions);
+        impl Sessions {
+            pub async fn call(
+                &self,
+                ctx: &super::common::CoreContext,
+                channel: &str,
+                body: serde_json::Value,
+            ) -> super::common::CoreResult {
+                self.0
+                    .handle(ctx, &std::sync::Arc::default(), channel, &[body])
+                    .await
+                    .ok_or("Not handled by native".to_string())?
+            }
+            pub async fn clear(&self) {
+                self.0.clear().await;
+            }
+            pub async fn uninstall(&self) {
+                self.0.clear_slug("word-count").await;
+            }
+        }
+    }
+}

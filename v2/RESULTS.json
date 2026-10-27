@@ -1,0 +1,86 @@
+{
+  "sourceSha": "472bc57b5b3d4eafbdfc7e5abffb52e11bdac04e",
+  "branch": "feat/native-v2-rust",
+  "betaPin": "fd300e276356587726566026f072563eb9c34cb1",
+  "originalPin": "6734d85992290066fd31a7f5bee3cca3d3545a1a",
+  "rustTests": {
+    "engine": 2,
+    "betaAdapterSdkNativeSessions": 19,
+    "stable": "pass",
+    "msrv1.85.0": "pass"
+  },
+  "format": "pass",
+  "strictAllTargetClippy": {
+    "stable": "pass",
+    "1.85.0": "pass",
+    "engineAndAdapter": true
+  },
+  "windowsGNU": {
+    "stableCheckClippy": "pass",
+    "1.85.0CheckClippy": "pass",
+    "executedOnWindows": false
+  },
+  "oracle": {
+    "sourceTests": 17,
+    "countingOracleCases": 139318,
+    "actualCommandParityCases": 60,
+    "sourceComponentTransitions": 3,
+    "typescript": "5.9.3",
+    "react": "19.2.3",
+    "locale": "en-US",
+    "seed": "0x17a53"
+  },
+  "renderer": {
+    "actualParser": true,
+    "actualReconciliation": true,
+    "actualSurfaceActionWiring": true,
+    "checks": 12,
+    "desktopQA": false
+  },
+  "schema": {
+    "validator": "Ajv 8.17.1 draft 2020-12",
+    "positive": 1,
+    "negative": 33,
+    "sourceMetadataAssertions": true
+  },
+  "v1": {
+    "test": 1,
+    "typecheck": "pass",
+    "lockAndSourceUnchanged": true,
+    "npm": "ignore-scripts; no original-root install"
+  },
+  "git": {
+    "stagingCommitPushPR": "not performed",
+    "v1": "byte-exact except README discovery link"
+  },
+  "icon": {
+    "bytes": 202088,
+    "sha256": "94f23ca4f94a07e1cbebd9b3f44f105ca231b88662c26aaf63ca221f6d45db7f"
+  },
+  "runtime": "pure Rust offline; no JS/Bun fallback",
+  "limits": {
+    "utf16Units": 1048576,
+    "noSilentTruncation": true,
+    "locale": "en-US clipboard summary"
+  },
+  "notRun": [
+    "host registration/rebuild",
+    "managed installation",
+    "real macOS UI/clipboard/selection/permissions/focus/window/overlay QA",
+    "real Windows UI/clipboard/selection/permissions/focus/window/overlay QA"
+  ],
+  "gaps": [
+    "Visible result forms replace source HUD/toast; no true overlay or original auto-hide",
+    "Beta arbitrary action shortcut/icon support missing",
+    "Other OS default numeric locales not matched",
+    "License full-text gaps listed in NOTICES.md",
+    "Final XERJ index refresh rejected frozen schema; current index incomplete"
+  ],
+  "package": {
+    "cargoPackage": "pass",
+    "extractedOfflineTests": "pass",
+    "allRequiredFilesPresent": true,
+    "generatedWorkTargetGitFilesForbidden": true,
+    "materializedBetaTestsSelfContained": true
+  }
+}
